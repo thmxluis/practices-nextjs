@@ -1,26 +1,39 @@
-import { useEffect, useState } from "react";
-import Head from "next/head";
-import AppLayout from "../components/AppLayout";
-import { colors } from "../styles/theme";
-import Button from "../components/Button";
-import GitHub from "../components/Icons/GitHub";
+// -- React / NextJs
+import { useEffect, useState } from "react"
+import Head from "next/head"
+import { useRouter } from "next/router"
 
-import { loginWithGitHub, onAuthStateChanged } from "../firebase/client";
+// -- Components
+import AppLayout from "components/AppLayout"
+import Button from "components/Button"
+import GitHub from "components/Icons/GitHub"
+import Avatar from "components/Avatar"
+import Logo from "components/Icons/Logo"
+// -- styles
+import { colors } from "styles/theme"
+
+// -- Firebase
+import { loginWithGitHub, onAuthStateChanged } from "firebase/client"
 
 export default function Home() {
-  const [user, setUser] = useState(undefined);
-  // console.log(user);
+  const [user, setUser] = useState(undefined)
+  const router = useRouter()
+
   useEffect(() => {
-    onAuthStateChanged(setUser);
-  }, []);
+    onAuthStateChanged(setUser)
+  }, [])
+
+  useEffect(() => {
+    user && router.replace("/home")
+  }, [user])
 
   const handleClick = () => {
     loginWithGitHub()
       .then(setUser)
       .catch((err) => {
-        console.log(err);
-      });
-  };
+        console.log(err)
+      })
+  }
 
   return (
     <>
@@ -31,7 +44,7 @@ export default function Home() {
 
       <AppLayout>
         <section>
-          <img src="/devter-logo.png" alt="Logo" />
+          <Logo width="100" />
           <h1>Devter</h1>
           <h2>
             Talk about development
@@ -40,7 +53,7 @@ export default function Home() {
           </h2>
 
           <div>
-            {user === undefined && (
+            {user === null && (
               <Button onClick={handleClick}>
                 <GitHub fill="#fff" width={24} height={24} />
                 Login with GitHub
@@ -48,8 +61,11 @@ export default function Home() {
             )}
             {user && user.avatar && (
               <div>
-                <img src={user.avatar} />
-                <strong>{user.username}</strong>
+                <Avatar
+                  alt={user.username}
+                  src={user.avatar}
+                  text={user.username}
+                />
               </div>
             )}
           </div>
@@ -73,17 +89,18 @@ export default function Home() {
         }
 
         h1 {
-          color: ${colors.secondary};
+          color: ${colors.primary};
           font-weight: 800;
+          font-size: 32px;
           margin-bottom: 16px;
         }
 
         h2 {
-          color: ${colors.primary};
+          color: ${colors.secondary};
           font-size: 21px;
           margin: 0;
         }
       `}</style>
     </>
-  );
+  )
 }
